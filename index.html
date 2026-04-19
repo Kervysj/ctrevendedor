@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#0a0a0a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>DebtControl Premium</title>
+    <title>Control de Ventas</title>
 
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkRlYnRDb250cm9sIFByZW1pdW0iLAogICJzaG9ydF9uYW1lIjogIkRlYnRDdXVkZXMiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBhMGEwYSIsCiAgInRoZW1lX2NvbG9yIjogIzAwZDFmZiIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzI3MjIvMjcyMjU2NC5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkNvbnRyb2wgZGUgVmVudGFzIiwKICAic2hvcnRfbmFtZSI6ICJWZW50YXNQcm8iLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBhMGEwYSIsCiAgInRoZW1lX2NvbG9yIjogIzAwZDFmZiIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzI2ODQvMjY4NDgyMC5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
 
     <style>
         :root {
@@ -38,33 +38,43 @@
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 12px;
-            position: relative;
+            overflow: hidden;
         }
 
-        .acordeon-header {
+        /* Cabecera del Lote Mejorada */
+        .lote-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .lote-info-main {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             cursor: pointer;
-            margin-right: 60px; /* Espacio para botones de acción */
         }
 
-        .action-buttons {
-            position: absolute;
-            top: 15px;
-            right: 15px;
+        .lote-controls {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            border-top: 1px solid #222;
+            padding-top: 10px;
+            justify-content: flex-end;
         }
 
-        .btn-mini {
+        .btn-action {
             background: #222;
             border: 1px solid #444;
-            color: white;
-            padding: 5px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
+            color: #888;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .status-badge {
@@ -148,18 +158,18 @@
     
     <div id="view-nueva" class="view">
         <div class="card">
-            <h3 style="margin:0 0 20px 0; font-weight: 300; text-align: center;">Nuevo Lote / Recepción</h3>
+            <h3 style="margin:0 0 20px 0; font-weight: 300; text-align: center;">Registro de Lote</h3>
             
-            <label>Producto</label>
-            <input type="text" id="prod-nombre" placeholder="Ej: PIE DE PARCHITA">
+            <label>Nombre del Producto</label>
+            <input type="text" id="prod-nombre" placeholder="Ej: TORTA DE CHOCOLATE">
             
             <div style="display:flex; gap:10px">
                 <div style="flex:1">
-                    <label>Porciones</label>
-                    <input type="number" id="prod-cant" placeholder="12">
+                    <label>Porciones Recibidas</label>
+                    <input type="number" id="prod-cant" placeholder="0">
                 </div>
                 <div style="flex:1">
-                    <label>Fecha Realización</label>
+                    <label>Fecha Lote</label>
                     <input type="date" id="prod-fecha">
                 </div>
             </div>
@@ -222,7 +232,8 @@
         save();
         render();
         document.getElementById('prod-nombre').value = "";
-        alert("Lote registrado.");
+        document.getElementById('prod-cant').value = "";
+        alert("Lote registrado correctamente.");
     }
 
     function cobrar(loteId, porcionIdx) {
@@ -259,8 +270,7 @@
     function editarLote(idx) {
         const l = lotes[idx];
         const nuevoNombre = prompt("Nombre del producto:", l.nombre);
-        if(nuevoNombre === null) return;
-        
+        if(!nuevoNombre) return;
         const nuevoCosto = prompt("Costo Proveedor:", l.costoProv);
         const nuevoPrecio = prompt("Precio Venta:", l.precioVenta);
         
@@ -273,7 +283,7 @@
     }
 
     function eliminarLote(idx) {
-        if(confirm("¿Seguro que quieres borrar este lote completo? No se puede deshacer.")) {
+        if(confirm("¿Seguro que quieres borrar este lote completo?")) {
             lotes.splice(idx, 1);
             save();
             render();
@@ -293,16 +303,18 @@
         
         lotes.forEach((l, idxLote) => {
             let html = `<div class="card">
-                <div class="action-buttons">
-                    <span class="btn-mini" onclick="editarLote(${idxLote})">✏️</span>
-                    <span class="btn-mini" onclick="eliminarLote(${idxLote})" style="color:var(--danger)">✖</span>
-                </div>
-                <div class="acordeon-header" onclick="toggleLote(${idxLote})">
-                    <div>
-                        <strong style="color:var(--accent)">${l.nombre}</strong><br>
-                        <small style="color:#666">Costo: $${l.costoProv} | Venta: $${l.precioVenta}</small>
+                <div class="lote-header">
+                    <div class="lote-info-main" onclick="toggleLote(${idxLote})">
+                        <div>
+                            <strong style="color:var(--accent); font-size:16px">${l.nombre}</strong><br>
+                            <small style="color:#666">Costo: $${l.costoProv} | Venta: $${l.precioVenta}</small>
+                        </div>
+                        <div class="status-badge">${l.porciones.length} porciones ▾</div>
                     </div>
-                    <div class="status-badge">${l.porciones.length} p. ▾</div>
+                    <div class="lote-controls">
+                        <span class="btn-action" onclick="editarLote(${idxLote})">✏️ Editar</span>
+                        <span class="btn-action" onclick="eliminarLote(${idxLote})" style="color:var(--danger); border-color:#500">🗑️ Borrar</span>
+                    </div>
                 </div>
                 
                 <div id="lote-det-${idxLote}" class="hidden" style="margin-top:15px; border-top: 1px solid #333; padding-top:10px">`;
