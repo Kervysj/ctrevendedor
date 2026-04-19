@@ -18,6 +18,7 @@
             --text: #e0e0e0;
             --danger: #ff4d4d;
             --success: #00ff88;
+            --warning: #ffcc00;
             --border: #333;
         }
 
@@ -39,22 +40,12 @@
             margin-bottom: 15px;
             border-radius: 12px;
             overflow: hidden;
+            position: relative;
         }
 
-        /* Cabecera del Lote Mejorada */
-        .lote-header {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .lote-info-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            cursor: pointer;
-        }
-
+        .lote-header { display: flex; flex-direction: column; gap: 10px; }
+        .lote-info-main { display: flex; justify-content: space-between; align-items: flex-start; cursor: pointer; }
+        
         .lote-controls {
             display: flex;
             gap: 10px;
@@ -77,13 +68,16 @@
             gap: 5px;
         }
 
+        /* Estética mejorada para el contador de porciones */
         .status-badge {
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            background: rgba(0, 209, 255, 0.1);
+            font-size: 10px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #000;
             color: var(--accent);
             border: 1px solid var(--accent);
+            box-shadow: 0 0 10px rgba(0, 209, 255, 0.2);
+            text-align: right;
         }
 
         input {
@@ -125,6 +119,7 @@
             width: 70px;
             padding: 12px;
             margin: 0;
+            color: #000;
         }
 
         .nav-bar {
@@ -149,6 +144,19 @@
             font-size: 13px;
             border: 1px solid #222;
         }
+
+        /* Alerta de historial casi lleno */
+        .historial-alerta {
+            background: rgba(255, 204, 0, 0.1);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            text-align: center;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -159,9 +167,8 @@
     <div id="view-nueva" class="view">
         <div class="card">
             <h3 style="margin:0 0 20px 0; font-weight: 300; text-align: center;">Registro de Lote</h3>
-            
             <label>Nombre del Producto</label>
-            <input type="text" id="prod-nombre" placeholder="Ej: TORTA DE CHOCOLATE">
+            <input type="text" id="prod-nombre" placeholder="Ej: PIE DE PARCHITA">
             
             <div style="display:flex; gap:10px">
                 <div style="flex:1">
@@ -184,7 +191,6 @@
                     <input type="number" id="prod-venta" placeholder="2.50">
                 </div>
             </div>
-
             <button onclick="crearLote()">REGISTRAR LOTE</button>
         </div>
     </div>
@@ -194,7 +200,8 @@
     </div>
 
     <div id="view-historial" class="view hidden">
-        <button id="btn-borrar-hist" class="hidden" style="background: var(--danger); margin-bottom:20px;" onclick="borrarHistorial()">BORRAR HISTORIAL</button>
+        <div id="aviso-lleno" class="historial-alerta hidden">⚠️ HISTORIAL CASI LLENO - POR FAVOR LIMPIAR</div>
+        <button id="btn-borrar-hist" class="hidden" style="background: var(--danger); margin-bottom:20px;" onclick="borrarHistorial()">🗑️ BORRAR TODO EL HISTORIAL</button>
         <div id="lista-historial"></div>
     </div>
 </div>
@@ -226,6 +233,8 @@
             fechaProd: fecha,
             costoProv: costo,
             precioVenta: venta,
+            porcionesTotal: cant, // Fijo
+            porcionesVendidas: 0, // Inicia en 0
             porciones: Array(cant).fill().map((_, i) => ({ id_p: i }))
         });
 
@@ -245,20 +254,29 @@
         if(ref === null) return;
 
         const lote = lotes.find(l => l.id === loteId);
-        const p = lote.porciones[porcionIdx];
-        const ganancia = (lote.precioVenta - lote.costoProv).toFixed(2);
+        const gananciaIndividual = (lote.precioVenta - lote.costoProv);
+        
+        // Sumar porción vendida
+        lote.porcionesVendidas++;
 
+        // Agregar al historial
         historial.unshift({
             producto: lote.nombre,
             cliente: cliente,
             cobrado: lote.precioVenta,
             costo: lote.costoProv,
-            ganancia: ganancia,
+            ganancia: gananciaIndividual.toFixed(2),
             ref: ref || "S/R",
             fechaProd: lote.fechaProd,
             fechaEnt: fechaEnt,
             fechaPago: new Date().toLocaleDateString()
         });
+
+        // Verificar si se vendió todo
+        if(lote.porcionesVendidas === lote.porcionesTotal) {
+            const gananciaTotalLote = (gananciaIndividual * lote.porcionesTotal).toFixed(2);
+            alert(`¡FELICIDADES! 🎉\nVendiste todas las porciones de ${lote.nombre}.\n\nPorciones vendidas: ${lote.porcionesTotal}\nGanancia Total Neta: $${gananciaTotalLote}`);
+        }
 
         lote.porciones.splice(porcionIdx, 1);
         if(lote.porciones.length === 0) lotes = lotes.filter(l => l.id !== loteId);
@@ -298,6 +316,7 @@
     function render() {
         const listaP = document.getElementById('lista-pendientes');
         const listaH = document.getElementById('lista-historial');
+        const avisoLleno = document.getElementById('aviso-lleno');
         
         listaP.innerHTML = lotes.length === 0 ? "<div style='text-align:center; padding:50px; color:#555'>No hay cobros pendientes</div>" : "";
         
@@ -309,7 +328,10 @@
                             <strong style="color:var(--accent); font-size:16px">${l.nombre}</strong><br>
                             <small style="color:#666">Costo: $${l.costoProv} | Venta: $${l.precioVenta}</small>
                         </div>
-                        <div class="status-badge">${l.porciones.length} porciones ▾</div>
+                        <div class="status-badge">
+                            PORCIONES RECIBIDAS: ${l.porcionesTotal}<br>
+                            PORCIONES VENDIDAS: ${l.porcionesVendidas}
+                        </div>
                     </div>
                     <div class="lote-controls">
                         <span class="btn-action" onclick="editarLote(${idxLote})">✏️ Editar</span>
@@ -340,12 +362,13 @@
             listaP.innerHTML += html;
         });
 
+        // Render Historial y Alertas
         listaH.innerHTML = "";
         historial.forEach((h, i) => {
             listaH.innerHTML += `<div class="card" onclick="toggleHist(${i})">
-                <div style="display:flex; justify-content:space-between">
+                <div style="display:flex; justify-content:space-between; align-items:center">
                     <span><b>${h.producto}</b><br><small>${h.cliente}</small></span>
-                    <span style="color:var(--accent)">+$${h.ganancia} ▾</span>
+                    <span style="color:var(--accent); font-weight:bold">+$${h.ganancia} ▾</span>
                 </div>
                 <div id="hist-det-${i}" class="hidden" style="margin-top:10px; padding-top:10px; border-top:1px dashed #444; font-size:13px">
                     Ref: <b>${h.ref}</b> | Cobrado: $${h.cobrado} | Pago Prov: $${h.costo}<br>
@@ -353,6 +376,19 @@
                 </div>
             </div>`;
         });
+
+        // Advertencia de historial lleno
+        if(historial.length >= 35 && historial.length < 45) {
+            avisoLleno.classList.remove('hidden');
+            avisoLleno.style.color = "var(--warning)";
+        } else if(historial.length >= 45) {
+            avisoLleno.classList.remove('hidden');
+            avisoLleno.style.color = "var(--danger)";
+            avisoLleno.innerText = "⛔ CRÍTICO: HISTORIAL LLENO - ELIMINE PARA CONTINUAR";
+        } else {
+            avisoLleno.classList.add('hidden');
+        }
+
         document.getElementById('btn-borrar-hist').classList.toggle('hidden', historial.length < 45);
     }
 
