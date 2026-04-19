@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#0a0a0a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>DebtControl Premium</title>
+    <title>Revendedor Pro</title>
 
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkRlYnRDb250cm9sIFByZW1pdW0iLAogICJzaG9ydF9uYW1lIjogIkRlYnRDdXVkZXMiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBhMGEwYSIsCiAgInRoZW1lX2NvbG9yIjogIzAwZDFmZiIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImh0dHBzOi8vY2RuLWljb25zLXBuZy5mbGF0aWNvbi5jb20vNTEyLzI3MjIvMjcyMjU2NC5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlJldmVuZGVkb3IgUHJvIiwKICAic2hvcnRfbmFtZSI6ICJSZXZlbmRlZG9yIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwYTBhMGEiLAogICJ0aGVtZV9jb2xvciI6ICMwMGQxZmYiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL2Nkbi1pY29ucy1wbmcuZmxhdGljb24uY29tLzUxMi8xMDUyLzEwNTI4NjEucG5nIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9CiAgXQp9">
 
     <style>
         :root {
@@ -18,6 +18,7 @@
             --text: #e0e0e0;
             --danger: #ff4d4d;
             --success: #00ff88;
+            --warning: #ffcc00;
             --border: #333;
         }
 
@@ -51,9 +52,9 @@
             font-size: 11px;
             padding: 4px 10px;
             border-radius: 12px;
-            background: rgba(0, 209, 255, 0.1);
-            color: var(--accent);
-            border: 1px solid var(--accent);
+            background: rgba(255, 204, 0, 0.1);
+            color: var(--warning);
+            border: 1px solid var(--warning);
         }
 
         input {
@@ -65,7 +66,7 @@
             color: white;
             border-radius: 10px;
             box-sizing: border-box;
-            font-size: 16px; /* Evita zoom automático en iPhone */
+            font-size: 16px;
         }
 
         label { font-size: 11px; color: var(--accent); margin-left: 5px; text-transform: uppercase; font-weight: bold; }
@@ -79,7 +80,6 @@
             font-weight: bold;
             border-radius: 10px;
             margin-top: 15px;
-            font-size: 14px;
             text-transform: uppercase;
         }
 
@@ -88,8 +88,7 @@
             margin: 15px 0;
             padding: 15px;
             border-radius: 12px;
-            border-left: 4px solid var(--accent);
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            border-left: 4px solid var(--warning);
         }
 
         .btn-check {
@@ -97,7 +96,6 @@
             width: 70px;
             padding: 12px;
             margin: 0;
-            font-size: 16px;
         }
 
         .nav-bar {
@@ -111,45 +109,48 @@
         }
 
         .nav-item { flex: 1; text-align: center; font-size: 11px; color: #666; }
-        .nav-item.active { color: var(--accent); font-weight: bold; }
+        .nav-item.active { color: var(--accent); }
         .hidden { display: none; }
 
-        .hist-content {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px dashed #444;
-            font-size: 14px;
-            line-height: 1.6;
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-top: 5px;
+            color: #aaa;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="app-title">PRODUCCIÓN</h2>
+    <h2 id="app-title">RECEPCIÓN</h2>
     
     <div id="view-nueva" class="view">
         <div class="card">
-            <h3 style="margin:0 0 20px 0; font-weight: 300; text-align: center; color: var(--text);">Nueva Producción</h3>
+            <h3 style="margin:0 0 20px 0; font-weight: 300; text-align: center;">Recibir de Proveedor</h3>
             
-            <label>Nombre del Producto</label>
-            <input type="text" id="prod-nombre" placeholder="Ej: PIE DE PARCHITA">
+            <label>Producto</label>
+            <input type="text" id="prod-nombre" placeholder="Ej: TORTA DE CHOCOLATE">
             
+            <label>Porciones Recibidas</label>
+            <input type="number" id="prod-cant" placeholder="12">
+
             <div style="display:flex; gap:10px">
                 <div style="flex:1">
-                    <label>Porciones</label>
-                    <input type="number" id="prod-cant" placeholder="12">
+                    <label>Costo Proveedor ($)</label>
+                    <input type="number" id="prod-costo" placeholder="1.50">
                 </div>
                 <div style="flex:1">
-                    <label>Precio Unitario ($)</label>
-                    <input type="number" id="prod-precio" placeholder="2.0">
+                    <label>Precio Venta ($)</label>
+                    <input type="number" id="prod-venta" placeholder="2.50">
                 </div>
             </div>
 
-            <label>Fecha de Realización</label>
-            <input type="date" id="prod-fecha-manual">
+            <label>Fecha Recibido</label>
+            <input type="date" id="prod-fecha">
             
-            <button onclick="crearLote()">REGISTRAR LOTE</button>
+            <button onclick="crearLote()">REGISTRAR PARA VENTA</button>
         </div>
     </div>
 
@@ -158,132 +159,114 @@
     </div>
 
     <div id="view-historial" class="view hidden">
-        <button id="btn-borrar-hist" class="hidden" style="background: var(--danger); margin-bottom:20px;" onclick="borrarHistorial()">BORRAR HISTORIAL DEFINITIVO</button>
+        <button id="btn-borrar-hist" class="hidden" style="background: var(--danger); margin-bottom:20px;" onclick="borrarHistorial()">BORRAR HISTORIAL</button>
         <div id="lista-historial"></div>
     </div>
 </div>
 
 <div class="nav-bar">
-    <div class="nav-item active" onclick="changeView('nueva', this)"><span>➕</span><br>Nuevo</div>
-    <div class="nav-item" onclick="changeView('pendientes', this)"><span>⏳</span><br>Cobros</div>
-    <div class="nav-item" onclick="changeView('historial', this)"><span>📜</span><br>Historial</div>
+    <div class="nav-item active" onclick="changeView('nueva', this)"><span>📥</span><br>Recibir</div>
+    <div class="nav-item" onclick="changeView('pendientes', this)"><span>💰</span><br>Ventas</div>
+    <div class="nav-item" onclick="changeView('historial', this)"><span>📜</span><br>Cerrados</div>
 </div>
 
 <script>
-    // Iniciar fecha por defecto
-    document.getElementById('prod-fecha-manual').valueAsDate = new Date();
+    document.getElementById('prod-fecha').valueAsDate = new Date();
 
-    let lotes = JSON.parse(localStorage.getItem('lotes_v5')) || [];
-    let historial = JSON.parse(localStorage.getItem('historial_v5')) || [];
+    let lotes = JSON.parse(localStorage.getItem('rev-lotes')) || [];
+    let historial = JSON.parse(localStorage.getItem('rev-hist')) || [];
 
     function crearLote() {
-        const nombreInput = document.getElementById('prod-nombre');
-        const cantInput = document.getElementById('prod-cant');
-        const precioInput = document.getElementById('prod-precio');
-        const fechaInput = document.getElementById('prod-fecha-manual');
+        const nombre = document.getElementById('prod-nombre').value.toUpperCase().trim();
+        const cant = parseInt(document.getElementById('prod-cant').value);
+        const costo = parseFloat(document.getElementById('prod-costo').value);
+        const venta = parseFloat(document.getElementById('prod-venta').value);
+        const fecha = document.getElementById('prod-fecha').value;
 
-        const nombre = nombreInput.value.toUpperCase().trim();
-        const cant = parseInt(cantInput.value);
-        const precio = precioInput.value;
-        const fechaProd = fechaInput.value;
-
-        if(!nombre || isNaN(cant) || !precio || !fechaProd) {
-            alert("⚠️ Por favor, rellena todos los campos correctamente.");
-            return;
-        }
+        if(!nombre || isNaN(cant) || isNaN(costo) || isNaN(venta)) return alert("Completa todos los datos");
 
         const nuevoLote = {
             id: Date.now(),
             nombre: nombre,
-            fechaProd: fechaProd,
-            porciones: Array(cant).fill().map((_, i) => ({
-                id_p: i,
-                precio: precio
-            }))
+            fechaProd: fecha,
+            costoProv: costo,
+            precioVenta: venta,
+            porciones: Array(cant).fill().map((_, i) => ({ id_p: i }))
         };
 
         lotes.push(nuevoLote);
         save();
         render();
-        
-        // Limpiar
-        nombreInput.value = "";
-        cantInput.value = "";
-        precioInput.value = "";
-        
-        alert("✅ Lote registrado correctamente.");
-        // Opcional: saltar a la pestaña de cobros automáticamente
-        // changeView('pendientes', document.querySelectorAll('.nav-item')[1]);
+        document.getElementById('prod-nombre').value = "";
+        alert("Lote listo para revender");
     }
 
     function cobrar(loteId, porcionIdx) {
-        const clienteVal = document.getElementById(`cli-${loteId}-${porcionIdx}`).value.trim();
-        const fechaEntVal = document.getElementById(`fent-${loteId}-${porcionIdx}`).value;
-        
-        if(!clienteVal) {
-            alert("Escribe el nombre del cliente que lleva la porción.");
-            return;
-        }
+        const cliente = document.getElementById(`cli-${loteId}-${porcionIdx}`).value.trim();
+        if(!cliente) return alert("Escribe el nombre del cliente");
 
-        const ref = prompt(`Referencia de pago para ${clienteVal}:`);
+        const ref = prompt(`Referencia de pago PASADA AL PROVEEDOR:`);
         if(ref === null) return;
 
         const lote = lotes.find(l => l.id === loteId);
-        const p = lote.porciones[porcionIdx];
+        const ganancia = (lote.precioVenta - lote.costoProv).toFixed(2);
 
         historial.unshift({
             producto: lote.nombre,
-            cliente: clienteVal,
-            precio: p.precio,
-            fechaProd: lote.fechaProd,
-            fechaEnt: fechaEntVal,
-            fechaPago: new Date().toLocaleDateString(),
-            ref: ref || "S/R"
+            cliente: cliente,
+            cobrado: lote.precioVenta,
+            pagadoProv: lote.costoProv,
+            ganancia: ganancia,
+            refProv: ref || "S/R",
+            fecha: new Date().toLocaleDateString()
         });
 
         lote.porciones.splice(porcionIdx, 1);
-        if(lote.porciones.length === 0) {
-            lotes = lotes.filter(l => l.id !== loteId);
-        }
+        if(lote.porciones.length === 0) lotes = lotes.filter(l => l.id !== loteId);
 
         save();
         render();
     }
 
     function save() {
-        localStorage.setItem('lotes_v5', JSON.stringify(lotes));
-        localStorage.setItem('historial_v5', JSON.stringify(historial));
+        localStorage.setItem('rev-lotes', JSON.stringify(lotes));
+        localStorage.setItem('rev-hist', JSON.stringify(historial));
     }
 
     function render() {
         const listaP = document.getElementById('lista-pendientes');
         const listaH = document.getElementById('lista-historial');
         
-        listaP.innerHTML = lotes.length === 0 ? "<div style='text-align:center; padding:50px; color:#555'>No hay cobros pendientes</div>" : "";
+        listaP.innerHTML = lotes.length === 0 ? "<div style='text-align:center; padding:50px; color:#555'>Sin productos para vender</div>" : "";
         
         lotes.forEach((l, idxLote) => {
             let html = `<div class="card">
                 <div class="acordeon-header" onclick="toggleLote(${idxLote})">
                     <div>
-                        <strong style="color:var(--accent); font-size:16px">${l.nombre}</strong><br>
-                        <small style="color:#666">Hecho el: ${l.fechaProd}</small>
+                        <strong style="color:var(--accent)">${l.nombre}</strong><br>
+                        <small style="color:#666">Costo: $${l.costoProv} | Venta: $${l.precioVenta}</small>
                     </div>
-                    <div class="status-badge">${l.porciones.length} por cobrar ▾</div>
+                    <div class="status-badge">${l.porciones.length} por vender ▾</div>
                 </div>
                 
-                <div id="lote-det-${idxLote}" class="hidden" style="margin-top:20px; border-top: 1px solid #333; padding-top:10px">`;
+                <div id="lote-det-${idxLote}" class="hidden" style="margin-top:15px; border-top: 1px solid #333; padding-top:10px">`;
             
             l.porciones.forEach((p, idx) => {
                 html += `<div class="portion-item">
-                    <label>Nombre del Cliente</label>
-                    <input type="text" id="cli-${l.id}-${idx}" placeholder="¿Quién lo debe?" style="margin-bottom:10px">
-                    <div style="display:flex; gap:10px; align-items:flex-end">
-                        <div style="flex:1">
-                            <label>Fecha de Entrega</label>
-                            <input type="date" id="fent-${l.id}-${idx}" value="${new Date().toISOString().split('T')[0]}" style="margin:0">
+                    <label>Vendido a:</label>
+                    <input type="text" id="cli-${l.id}-${idx}" placeholder="Nombre del cliente">
+                    <div style="background:#111; padding:10px; border-radius:8px; margin-top:5px; font-size:13px">
+                        <div style="display:flex; justify-content:space-between">
+                            <span>Cobrar al cliente:</span> <b style="color:var(--success)">$${l.precioVenta}</b>
                         </div>
-                        <button class="btn-check" onclick="cobrar(${l.id}, ${idx})">OK</button>
+                        <div style="display:flex; justify-content:space-between; margin-top:5px">
+                            <span>Pagar a Proveedor:</span> <b style="color:var(--danger)">$${l.costoProv}</b>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-top:5px; border-top:1px solid #222; padding-top:5px">
+                            <span>Tu Ganancia:</span> <b style="color:var(--accent)">$${(l.precioVenta - l.costoProv).toFixed(2)}</b>
+                        </div>
                     </div>
+                    <button class="btn-check" onclick="cobrar(${l.id}, ${idx})" style="margin-top:10px">PAGADO AL PROVEEDOR (OK)</button>
                 </div>`;
             });
             html += `</div></div>`;
@@ -293,15 +276,14 @@
         listaH.innerHTML = "";
         historial.forEach((h, i) => {
             listaH.innerHTML += `<div class="card" onclick="toggleHist(${i})">
-                <div style="display:flex; justify-content:space-between; align-items:center">
+                <div style="display:flex; justify-content:space-between">
                     <span><b>${h.producto}</b><br><small>${h.cliente}</small></span>
-                    <span style="color:var(--success); font-weight:bold">$${h.precio} ▾</span>
+                    <span style="color:var(--accent)">+$${h.ganancia} ganancia ▾</span>
                 </div>
-                <div id="hist-det-${i}" class="hidden hist-content">
-                    <strong>Ref:</strong> <span style="color:var(--accent)">${h.ref}</span><br>
-                    <strong>Preparación:</strong> ${h.fechaProd}<br>
-                    <strong>Entregado:</strong> ${h.fechaEnt}<br>
-                    <strong>Cobrado:</strong> ${h.fechaPago}
+                <div id="hist-det-${i}" class="hidden" style="margin-top:10px; padding-top:10px; border-top:1px dashed #444; font-size:13px">
+                    Ref Enviada a Proveedor: <b>${h.refProv}</b><br>
+                    Cobrado: $${h.cobrado} | Pagado Prov: $${h.pagadoProv}<br>
+                    Fecha: ${h.fecha}
                 </div>
             </div>`;
         });
@@ -309,30 +291,18 @@
         document.getElementById('btn-borrar-hist').classList.toggle('hidden', historial.length < 45);
     }
 
-    function toggleLote(idx) {
-        document.getElementById(`lote-det-${idx}`).classList.toggle('hidden');
-    }
-
-    function toggleHist(i) {
-        document.getElementById(`hist-det-${i}`).classList.toggle('hidden');
-    }
+    function toggleLote(idx) { document.getElementById(`lote-det-${idx}`).classList.toggle('hidden'); }
+    function toggleHist(i) { document.getElementById(`hist-det-${i}`).classList.toggle('hidden'); }
 
     function changeView(view, el) {
         document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
         document.getElementById('view-' + view).classList.remove('hidden');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
-        document.getElementById('app-title').innerText = view === 'nueva' ? 'PRODUCCIÓN' : (view === 'pendientes' ? 'COBROS' : 'HISTORIAL');
+        document.getElementById('app-title').innerText = view === 'nueva' ? 'RECEPCIÓN' : (view === 'pendientes' ? 'VENTAS' : 'CERRADOS');
     }
 
-    function borrarHistorial() {
-        if(confirm("¿Estás seguro de que quieres vaciar el historial?")) { 
-            historial = []; 
-            save(); 
-            render(); 
-        }
-    }
-
+    function borrarHistorial() { if(confirm("¿Vaciar historial?")) { historial = []; save(); render(); } }
     render();
 </script>
 </body>
